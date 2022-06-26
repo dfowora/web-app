@@ -29,7 +29,7 @@ node("")
     stage("6.DeploytoUAT")
     {
         sh "echo Deploying to UAT Tomcat"
-        deploy adapters: [tomcat9(credentialsId: 'TomcatLogin', path: '', url: 'http://54.191.164.248:8080')], contextPath: null, war: 'target/*.war'
+        deploy adapters: [tomcat9(credentialsId: 'TomcatLogin', path: '', url: 'http://172.31.47.80:8080')], contextPath: null, war: 'target/*.war'
     }
     stage("7.Approval")
     {
@@ -42,7 +42,7 @@ node("")
     stage("8.DeployToProdTomcat")
     {
         sh "echo Deploying to Prod Tomcat"
-        deploy adapters: [tomcat9(credentialsId: 'TomcatLogin', path: '', url: 'http://54.191.164.248:8080')], contextPath: null, war: 'target/*.war'
+        deploy adapters: [tomcat9(credentialsId: 'TomcatLogin', path: '', url: 'http://172.31.47.80:8080')], contextPath: null, war: 'target/*.war'
     }
     stage("9.Email Notification")
     {
