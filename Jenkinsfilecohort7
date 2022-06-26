@@ -1,0 +1,53 @@
+node("")
+{
+    def MHD = tool name: "maven3.8.4"
+    stage("1.Initiation")
+    {
+        sh "echo Start of Barclays application build"
+    }
+    stage("2.Git Clone")
+    {
+        sh "echo start of Git clone"
+        git "https://github.com/dfowora/web-app.git"
+    }
+    
+    stage("3.Build")
+    {
+        sh "echo building application with Maven"
+        sh "${MHD}/bin/mvn package" 
+    }
+    stage("4.Code Quality")
+    {
+        sh "echo Performing code test with Sonarqube"
+        sh "${MHD}/bin/mvn sonar:sonar"
+    }
+    /*stage("5.Artifactory")
+    {
+        sh "echo Create Artifactory"
+        sh "${MHD}/bin/mvn deploy"
+    }*/
+    stage("6.DeploytoUAT")
+    {
+        sh "echo Deploying to UAT Tomcat"
+        deploy adapters: [tomcat9(credentialsId: 'TomcatLogin', path: '', url: 'http://54.191.164.248:8080')], contextPath: null, war: 'target/*.war'
+    }
+    stage("7.Approval")
+    {
+        sh "echo Approval Needed"
+        timeout(time:5, unit:'DAYS')
+        {
+            input message: "Approval for Production"
+        }
+    }
+    stage("8.DeployToProdTomcat")
+    {
+        sh "echo Deploying to Prod Tomcat"
+        deploy adapters: [tomcat9(credentialsId: 'TomcatLogin', path: '', url: 'http://54.191.164.248:8080')], contextPath: null, war: 'target/*.war'
+    }
+    stage("9.Email Notification")
+    {
+        sh "echo Sending email notification to devops team"
+        emailext body: 'Deployment was successful', subject: 'Deploy Success', to: 'd.fowora01@gmail.com'
+    }
+}
+
